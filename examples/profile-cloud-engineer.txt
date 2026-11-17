@@ -1,0 +1,7 @@
+Cloud / DevOps Engineer
+
+4 years of experience building and operating cloud infrastructure on AWS and Azure.
+Skills: Python, Bash, PowerShell, Terraform, Ansible, Docker, Kubernetes (EKS/AKS), Jenkins, GitHub Actions, CI/CD,
+Linux administration (RHEL, Ubuntu), networking (DNS, VPC, load balancers), monitoring with Datadog, Prometheus and Grafana,
+SQL (PostgreSQL), Git, Agile/Scrum, IAM and cloud security best practices.
+Looking for Cloud Engineer, DevOps Engineer, Site Reliability Engineer or Platform Engineer roles in the Chicago area.

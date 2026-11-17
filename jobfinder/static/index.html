@@ -1,0 +1,351 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Illinois IT Job Finder</title>
+<style>
+:root{
+  --bg:#f6f7f9;--panel:#fff;--ink:#14171c;--muted:#5d6672;--line:#e3e6ea;--accent:#1f5eff;--accent-ink:#fff;
+  --good:#127a46;--good-bg:#e5f5ec;--warn:#8a5a00;--warn-bg:#fff4dc;--chip:#eef1f5;--danger:#b42318;
+}
+@media (prefers-color-scheme:dark){:root{
+  --bg:#0f1115;--panel:#171a20;--ink:#e8eaee;--muted:#9aa3ae;--line:#2a2f38;--accent:#6b93ff;--accent-ink:#0b0d12;
+  --good:#5fd39a;--good-bg:#12291f;--warn:#f0c062;--warn-bg:#2b2311;--chip:#232831;--danger:#ff7b72;}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+header{display:flex;align-items:center;gap:16px;padding:14px 24px;border-bottom:1px solid var(--line);background:var(--panel);position:sticky;top:0;z-index:5}
+header h1{font-size:17px;margin:0;font-weight:650;letter-spacing:-.01em}
+header .sub{color:var(--muted);font-size:13px}
+nav{margin-left:auto;display:flex;gap:4px}
+nav button{background:none;border:0;color:var(--muted);padding:7px 12px;border-radius:7px;cursor:pointer;font:inherit}
+nav button.on{background:var(--chip);color:var(--ink);font-weight:600}
+main{display:grid;grid-template-columns:360px 1fr;gap:20px;padding:20px 24px;max-width:1500px;margin:0 auto}
+@media (max-width:900px){main{grid-template-columns:1fr;padding:16px}}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px}
+.panel h2{font-size:13px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:0 0 12px;font-weight:600}
+label{display:block;font-weight:600;font-size:13px;margin:12px 0 5px}
+label .hint{font-weight:400;color:var(--muted)}
+textarea,input[type=text],input[type=number],select{width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);font:inherit}
+textarea{min-height:180px;resize:vertical}
+.row{display:flex;gap:8px;align-items:center}
+.check{display:flex;align-items:center;gap:8px;font-weight:400;margin:6px 0}
+.check small{color:var(--muted)}
+.btn{background:var(--accent);color:var(--accent-ink);border:0;border-radius:8px;padding:10px 14px;font:inherit;font-weight:600;cursor:pointer}
+.btn:disabled{opacity:.5;cursor:default}
+.btn.ghost{background:var(--chip);color:var(--ink);font-weight:500}
+.btn.sm{padding:5px 10px;font-size:13px}
+.progress{height:6px;background:var(--chip);border-radius:6px;overflow:hidden;margin:10px 0}
+.progress div{height:100%;background:var(--accent);width:0;transition:width .3s}
+.log{font:12px/1.5 ui-monospace,Consolas,monospace;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:8px;max-height:180px;overflow:auto;white-space:pre-wrap;color:var(--muted)}
+.stats{display:flex;gap:18px;flex-wrap:wrap;margin:6px 0}
+.stat b{display:block;font-size:20px;font-variant-numeric:tabular-nums}
+.stat span{color:var(--muted);font-size:12px}
+.filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.filters input,.filters select{width:auto;min-width:130px}
+.filters input[type=text]{flex:1;min-width:200px}
+.job{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-bottom:10px;display:grid;grid-template-columns:56px 1fr auto;gap:14px}
+.job.applied{border-left:4px solid var(--good)}
+.job.saved{border-left:4px solid var(--accent)}
+.score{width:56px;height:56px;border-radius:50%;display:grid;place-items:center;font-weight:700;font-size:16px;font-variant-numeric:tabular-nums;border:3px solid var(--line)}
+.score.hi{border-color:var(--good);color:var(--good)}
+.score.mid{border-color:var(--warn);color:var(--warn)}
+.job h3{margin:0;font-size:15.5px;font-weight:650}
+.job h3 a{color:inherit;text-decoration:none}
+.job h3 a:hover{text-decoration:underline}
+.meta{color:var(--muted);font-size:13px;margin-top:2px;display:flex;gap:10px;flex-wrap:wrap}
+.chips{display:flex;gap:5px;flex-wrap:wrap;margin-top:8px}
+.chip{background:var(--chip);border-radius:20px;padding:2px 9px;font-size:12px}
+.chip.ok{background:var(--good-bg);color:var(--good)}
+.chip.miss{background:transparent;border:1px dashed var(--line);color:var(--muted)}
+.chip.cat{background:var(--warn-bg);color:var(--warn)}
+.actions{display:flex;flex-direction:column;gap:6px;align-items:stretch}
+.actions a.btn{text-align:center;text-decoration:none}
+details summary{cursor:pointer;color:var(--muted);font-size:13px;margin-top:8px}
+details .desc{white-space:pre-wrap;font-size:13px;max-height:340px;overflow:auto;margin-top:6px;padding:10px;background:var(--bg);border-radius:8px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+th{color:var(--muted);font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.04em}
+.muted{color:var(--muted)}
+.empty{text-align:center;color:var(--muted);padding:60px 20px}
+.badge{font-size:11px;padding:1px 7px;border-radius:10px;background:var(--chip)}
+.badge.off{color:var(--danger)}
+.hidden{display:none!important}
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <h1>Illinois IT Job Finder</h1>
+    <div class="sub">Deep search across employer career sites and US job databases</div>
+  </div>
+  <nav>
+    <button data-tab="search" class="on">Search</button>
+    <button data-tab="companies">Companies</button>
+  </nav>
+</header>
+
+<main id="tab-search">
+  <aside>
+    <div class="panel">
+      <h2>What you're looking for</h2>
+      <label for="profile">Your job description or resume <span class="hint">(paste it here)</span></label>
+      <textarea id="profile" placeholder="e.g.&#10;Cloud / DevOps Engineer with 4 years of experience in AWS, Terraform, Kubernetes, Python, CI/CD with GitHub Actions, Linux administration..."></textarea>
+      <label for="keywords">Must-have keywords <span class="hint">(comma separated)</span></label>
+      <input type="text" id="keywords" placeholder="aws, python, kubernetes">
+      <label for="exclude">Exclude jobs mentioning</label>
+      <input type="text" id="exclude" placeholder="security clearance, unpaid">
+      <label>Location</label>
+      <div class="check"><input type="checkbox" id="remote" checked> <span>Include US-remote jobs <small>(open to Illinois residents)</small></span></div>
+      <label for="maxemp">Company size</label>
+      <select id="maxemp">
+        <option value="25">Up to 25 employees</option><option value="50">Up to 50 employees</option>
+        <option value="100">Up to 100 employees</option><option value="300" selected>Up to 300 employees</option><option value="500">Up to 500 employees</option>
+        <option value="0">Any size</option>
+      </select>
+      <div class="check"><input type="checkbox" id="unknown"> <span>Include employers of unknown size</span></div>
+      <label for="age">Posted within</label>
+      <select id="age"><option value="0">Any time</option><option value="3">3 days</option><option value="7">7 days</option><option value="14">14 days</option><option value="30" selected>30 days</option><option value="60">60 days</option></select>
+      <label>Sources</label>
+      <div id="sources"></div>
+      <div class="row" style="margin-top:16px">
+        <button class="btn" id="go" style="flex:1">Search Illinois IT jobs</button>
+        <button class="btn ghost hidden" id="cancel">Stop</button>
+      </div>
+    </div>
+    <div class="panel" style="margin-top:16px">
+      <h2>Progress</h2>
+      <div class="stats">
+        <div class="stat"><b id="s-comp">0</b><span>companies</span></div>
+        <div class="stat"><b id="s-scan">0</b><span>scanned</span></div>
+        <div class="stat"><b id="s-kept">0</b><span>IL IT matches</span></div>
+        <div class="stat"><b id="s-new">0</b><span>new</span></div>
+      </div>
+      <div class="progress"><div id="bar"></div></div>
+      <div class="log" id="log">Ready.</div>
+      <label for="history">Previous searches</label>
+      <select id="history"></select>
+    </div>
+  </aside>
+
+  <section>
+    <div class="filters">
+      <input type="text" id="f-q" placeholder="Filter results (title, company, skill)…">
+      <select id="f-cat"><option value="">All IT categories</option></select>
+      <select id="f-level"><option value="">All levels</option></select>
+      <select id="f-loc"><option value="">Illinois + remote</option><option value="il">Illinois only</option><option value="remote">Remote only</option></select>
+      <select id="f-status"><option value="active">Not hidden</option><option value="new">New</option><option value="saved">Saved</option><option value="applied">Applied</option><option value="hidden">Hidden</option><option value="">All</option></select>
+      <a class="btn ghost sm" id="export" href="#">Export CSV</a>
+    </div>
+    <div class="muted" id="count" style="margin-bottom:10px"></div>
+    <div id="results"><div class="empty">Paste your job description, then run a search.<br>Results are ranked by how well each job matches you.</div></div>
+  </section>
+</main>
+
+<main id="tab-companies" class="hidden" style="grid-template-columns:1fr">
+  <div class="panel">
+    <h2>Add employers</h2>
+    <div class="row" style="flex-wrap:wrap">
+      <input type="text" id="c-name" placeholder="Company name" style="flex:1;min-width:180px">
+      <input type="text" id="c-site" placeholder="Website, e.g. https://www.example.com" style="flex:2;min-width:240px">
+      <input type="number" id="c-emp" placeholder="Employees" min="1" style="width:120px">
+      <button class="btn" id="c-add">Add</button>
+    </div>
+    <p class="muted" style="margin:8px 0 0">The crawler finds the company's careers page and hiring system automatically on the next search. Bulk import: paste CSV with a <code>name,website,employees</code> header. Searches only include employers whose size is within your limit.</p>
+    <textarea id="c-csv" style="min-height:70px;margin-top:8px" placeholder="name,website&#10;Acme Corp,https://acme.com"></textarea>
+    <button class="btn ghost sm" id="c-import" style="margin-top:6px">Import CSV</button>
+  </div>
+  <div class="panel" style="margin-top:16px">
+    <h2>Find more Illinois employers by size <span class="badge" id="pdl-badge"></span></h2>
+    <p class="muted" style="margin:0 0 8px">Uses People Data Labs to add Illinois tech/IT employers with a known headcount.
+      Each company found uses 1 credit of your People Data Labs plan.</p>
+    <div class="row" style="flex-wrap:wrap">
+      <label class="check" style="margin:0">Employees from <input type="number" id="p-min" value="5" min="1" style="width:80px"></label>
+      <label class="check" style="margin:0">to <input type="number" id="p-max" value="300" min="1" style="width:90px"></label>
+      <label class="check" style="margin:0">How many <input type="number" id="p-count" value="100" min="1" max="1000" style="width:90px"></label>
+      <button class="btn" id="p-find">Find employers</button>
+      <button class="btn ghost" id="p-enrich">Look up unknown sizes</button>
+    </div>
+    <div class="log hidden" id="p-log" style="margin-top:8px"></div>
+  </div>
+  <div class="panel" style="margin-top:16px;overflow:auto">
+    <h2 id="c-title">Tracked employers</h2>
+    <table><thead><tr><th>Company</th><th>Employees</th><th>Career system</th><th>Last IL IT jobs</th><th>Last crawled</th><th>Notes</th><th></th></tr></thead><tbody id="c-body"></tbody></table>
+  </div>
+</main>
+
+<script>
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const store = { get(k, d) { try { return localStorage.getItem(k) ?? d } catch { return d } },
+                set(k, v) { try { localStorage.setItem(k, v) } catch {} } };
+let RUN = 0, JOBS = [], logLen = 0, poll = null;
+
+// ---------- tabs
+document.querySelectorAll("nav button").forEach(b => b.onclick = () => {
+  document.querySelectorAll("nav button").forEach(x => x.classList.toggle("on", x === b));
+  $("#tab-search").classList.toggle("hidden", b.dataset.tab !== "search");
+  $("#tab-companies").classList.toggle("hidden", b.dataset.tab !== "companies");
+  if (b.dataset.tab === "companies") loadCompanies();
+});
+
+// ---------- form persistence
+["profile", "keywords", "exclude"].forEach(id => {
+  $("#" + id).value = store.get("jf-" + id, "");
+  $("#" + id).addEventListener("input", e => store.set("jf-" + id, e.target.value));
+});
+const list = s => s.split(",").map(x => x.trim()).filter(Boolean);
+
+async function init() {
+  const cfg = await (await fetch("/api/config")).json();
+  const labels = { companies: `Employer career sites (${cfg.company_count}; ${cfg.small_count} with ≤300 staff)`, usajobs: "USAJOBS (federal)",
+                   careeronestop: "CareerOneStop / National Labor Exchange", adzuna: "Adzuna (US job boards)" };
+  $("#sources").innerHTML = Object.entries(cfg.sources).map(([k, on]) => `
+    <div class="check"><input type="checkbox" value="${k}" ${on ? "checked" : "disabled"}>
+    <span>${labels[k]} ${on ? "" : '<span class="badge off">add API key in .env</span>'}</span></div>`).join("");
+  const runs = await (await fetch("/api/runs")).json();
+  $("#history").innerHTML = '<option value="">—</option>' + runs.map(r =>
+    `<option value="${r.id}">#${r.id} · ${new Date(r.started).toLocaleString()} · ${r.stats.kept ?? 0} jobs</option>`).join("");
+  if (runs.length) { $("#history").value = runs[0].id; RUN = runs[0].id; loadJobs(); showRun(RUN); }
+}
+$("#history").onchange = e => { if (e.target.value) { RUN = +e.target.value; loadJobs(); showRun(RUN); } };
+
+// ---------- search
+$("#go").onclick = async () => {
+  const sources = [...document.querySelectorAll("#sources input:checked")].map(i => i.value);
+  const body = { profile: $("#profile").value, keywords: list($("#keywords").value), exclude: list($("#exclude").value),
+                 include_remote: $("#remote").checked, sources, max_age_days: +$("#age").value,
+                 max_employees: +$("#maxemp").value, include_unknown_size: $("#unknown").checked };
+  const r = await (await fetch("/api/search", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) })).json();
+  RUN = r.run_id; logLen = 0; $("#log").textContent = "";
+  $("#go").disabled = true; $("#cancel").classList.remove("hidden");
+  clearInterval(poll); poll = setInterval(() => showRun(RUN, true), 1200);
+};
+$("#cancel").onclick = () => fetch(`/api/runs/${RUN}/cancel`, { method: "POST" });
+
+async function showRun(id, live) {
+  const r = await (await fetch(`/api/runs/${id}?since=${live ? logLen : 0}`)).json();
+  const s = r.stats || {};
+  $("#s-comp").textContent = `${s.companies_done ?? 0}/${s.companies_total ?? 0}`;
+  $("#s-scan").textContent = (s.fetched ?? 0).toLocaleString();
+  $("#s-kept").textContent = (s.kept ?? 0).toLocaleString();
+  $("#s-new").textContent = (s.new ?? 0).toLocaleString();
+  $("#bar").style.width = (r.status !== "running" ? 100 : 100 * (s.companies_done || 0) / Math.max(1, s.companies_total || 1)) + "%";
+  const el = $("#log");
+  if (live) { if (r.log.length) { el.textContent += r.log.join("\n") + "\n"; el.scrollTop = el.scrollHeight; } logLen = r.log_len; }
+  else el.textContent = r.log.slice(-200).join("\n");
+  if (live && r.status !== "running") {
+    clearInterval(poll); $("#go").disabled = false; $("#cancel").classList.add("hidden"); loadJobs(); init();
+  } else if (live && s.kept && s.kept % 10 === 0) loadJobs();
+}
+
+// ---------- results
+async function loadJobs() {
+  JOBS = await (await fetch(`/api/jobs?run_id=${RUN}`)).json();
+  const fill = (sel, key, label) => {
+    const vals = [...new Set(JOBS.map(j => j[key]).filter(Boolean))].sort();
+    const cur = $(sel).value;
+    $(sel).innerHTML = `<option value="">${label}</option>` + vals.map(v => `<option>${esc(v)}</option>`).join("");
+    $(sel).value = vals.includes(cur) ? cur : "";
+  };
+  fill("#f-cat", "it_category", "All IT categories"); fill("#f-level", "level", "All levels");
+  $("#export").href = `/api/export.csv?run_id=${RUN}`;
+  render();
+}
+["#f-q", "#f-cat", "#f-level", "#f-loc", "#f-status"].forEach(s => $(s).addEventListener("input", render));
+
+function render() {
+  const q = $("#f-q").value.toLowerCase(), cat = $("#f-cat").value, lvl = $("#f-level").value,
+        loc = $("#f-loc").value, st = $("#f-status").value;
+  const rows = JOBS.filter(j =>
+    (!q || `${j.title} ${j.company} ${j.location} ${(j.skills || []).join(" ")}`.toLowerCase().includes(q)) &&
+    (!cat || j.it_category === cat) && (!lvl || j.level === lvl) &&
+    (!loc || (loc === "il" ? j.is_illinois : !j.is_illinois)) &&
+    (st === "" || (st === "active" ? j.status !== "hidden" : j.status === st)));
+  $("#count").textContent = `${rows.length} of ${JOBS.length} jobs`;
+  if (!rows.length) { $("#results").innerHTML = '<div class="empty">No jobs match these filters.</div>'; return; }
+  $("#results").innerHTML = rows.slice(0, 400).map(j => `
+    <article class="job ${j.status}" data-id="${j.id}">
+      <div class="score ${j.score >= 60 ? "hi" : j.score >= 35 ? "mid" : ""}" title="Match score">${Math.round(j.score)}</div>
+      <div>
+        <h3><a href="${esc(j.url)}" target="_blank" rel="noopener">${esc(j.title)}</a></h3>
+        <div class="meta"><b>${esc(j.company)}</b>${j.employees != null ? `<span>${j.employees} employees</span>` : ""}<span>${esc([...new Set(j.location.split("|").map(s => s.trim()).filter(Boolean))].slice(0, 3).join(" · "))}${j.remote ? " · Remote" : ""}</span>
+          ${j.posted_at ? `<span>Posted ${esc(j.posted_at)}</span>` : ""}${j.salary ? `<span>${esc(j.salary)}</span>` : ""}
+          <span class="badge">${esc(j.source)}${j.also_on?.length ? " +" + j.also_on.length : ""}</span></div>
+        <div class="chips"><span class="chip cat">${esc(j.it_category)}</span><span class="chip">${esc(j.level)}</span>
+          ${(j.matched_skills || []).map(s => `<span class="chip ok">✓ ${esc(s)}</span>`).join("")}
+          ${(j.missing_skills || []).slice(0, 6).map(s => `<span class="chip miss">${esc(s)}</span>`).join("")}</div>
+        ${j.description ? `<details><summary>Job description</summary><div class="desc">${esc(j.description)}</div></details>` : ""}
+      </div>
+      <div class="actions">
+        <a class="btn sm" href="${esc(j.url)}" target="_blank" rel="noopener">Apply ↗</a>
+        <button class="btn ghost sm" data-s="${j.status === "saved" ? "new" : "saved"}">${j.status === "saved" ? "Unsave" : "Save"}</button>
+        <button class="btn ghost sm" data-s="${j.status === "applied" ? "new" : "applied"}">${j.status === "applied" ? "Undo applied" : "Mark applied"}</button>
+        <button class="btn ghost sm" data-s="${j.status === "hidden" ? "new" : "hidden"}">${j.status === "hidden" ? "Unhide" : "Hide"}</button>
+      </div>
+    </article>`).join("");
+}
+$("#results").addEventListener("click", async e => {
+  const b = e.target.closest("button[data-s]"); if (!b) return;
+  const id = b.closest(".job").dataset.id, status = b.dataset.s;
+  await fetch(`/api/jobs/${id}/status`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ status }) });
+  const j = JOBS.find(x => x.id === id); if (j) j.status = status; render();
+});
+
+// ---------- companies
+async function loadCompanies() {
+  const cs = await (await fetch("/api/companies")).json();
+  $("#c-title").textContent = `Tracked employers (${cs.length})`;
+  $("#c-body").innerHTML = cs.map(c => `<tr>
+    <td><b>${esc(c.name)}</b><br><span class="muted">${esc(c.hq || "")}</span></td>
+    <td><input type="number" min="1" value="${c.employees ?? ""}" placeholder="?" data-size="${c.id}" style="width:80px">
+      <br><span class="muted" style="font-size:11px">${esc(c.size_source || "")}</span></td>
+    <td>${c.ats ? `<span class="badge">${esc(c.ats)}</span><br><span class="muted" style="word-break:break-all">${esc(c.ats_id)}</span>` : '<span class="muted">auto-discover</span>'}</td>
+    <td>${c.last_crawled ? c.last_count : "—"}</td>
+    <td class="muted">${c.last_crawled ? new Date(c.last_crawled).toLocaleString() : "never"}</td>
+    <td class="muted" style="max-width:340px">${esc(c.last_error || "")}</td>
+    <td><button class="btn ghost sm" data-del="${c.id}">Remove</button></td></tr>`).join("");
+}
+$("#c-body").addEventListener("click", async e => {
+  const id = e.target.dataset.del; if (!id) return;
+  await fetch(`/api/companies/${id}`, { method: "DELETE" }); loadCompanies();
+});
+async function pdlCall(url, body, btn) {
+  const log = $("#p-log"); log.classList.remove("hidden"); log.textContent = "Working…";
+  document.querySelectorAll("#p-find,#p-enrich").forEach(b => b.disabled = true);
+  try {
+    const r = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body || {}) });
+    const d = await r.json();
+    log.textContent = r.ok ? d.log.join("\n") : (d.detail || "Request failed");
+    if (r.ok) loadCompanies();
+  } catch (e) { log.textContent = "Request failed: " + e; }
+  document.querySelectorAll("#p-find,#p-enrich").forEach(b => b.disabled = false);
+}
+$("#p-find").onclick = () => pdlCall("/api/companies/find",
+  { min_employees: +$("#p-min").value, max_employees: +$("#p-max").value, count: +$("#p-count").value });
+$("#p-enrich").onclick = () => pdlCall("/api/companies/enrich");
+fetch("/api/config").then(r => r.json()).then(c => {
+  $("#pdl-badge").textContent = c.pdl ? "connected" : "add PDL_API_KEY to .env";
+  $("#pdl-badge").classList.toggle("off", !c.pdl);
+});
+$("#c-body").addEventListener("change", async e => {
+  const id = e.target.dataset.size; if (!id) return;
+  await fetch(`/api/companies/${id}/size`, { method: "POST", headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ employees: e.target.value ? +e.target.value : null }) });
+});
+$("#c-add").onclick = async () => {
+  const name = $("#c-name").value.trim(); if (!name) return;
+  await fetch("/api/companies", { method: "POST", headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ name, website: $("#c-site").value.trim(), employees: $("#c-emp").value ? +$("#c-emp").value : null }) });
+  $("#c-name").value = $("#c-site").value = $("#c-emp").value = ""; loadCompanies();
+};
+$("#c-import").onclick = async () => {
+  const r = await (await fetch("/api/companies/import", { method: "POST", headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ csv: $("#c-csv").value }) })).json();
+  $("#c-csv").value = ""; await loadCompanies(); $("#c-title").textContent += ` — imported ${r.imported}`;
+};
+
+init();
+</script>
+</body>
+</html>
